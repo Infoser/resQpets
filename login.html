@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter Your Email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter Your Password" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <p id="statusMessage"></p>
+        <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYJeW38aOExaqr3anIpixEIFndXwnM3VQ",
+            authDomain: "resqpets-a47bb.firebaseapp.com",
+            projectId: "resqpets-a47bb",
+            storageBucket: "resqpets-a47bb.appspot.com",
+            messagingSenderId: "860383278515",
+            appId: "1:860383278515:web:d40ff043eafe21b36b07c6",
+            measurementId: "G-CPBEHQ6FT3"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Handle Login Form Submission
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get input values
+            let email = document.getElementById("email").value.trim();
+            let password = document.getElementById("password").value.trim();
+
+            if (email === "" || password === "") {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Firebase Authentication - Sign In
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Success: redirect to dashboard or other page
+                    document.getElementById("statusMessage").textContent = "Login successful!";
+                    document.getElementById("statusMessage").className = "success";
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html'; // Change this to the page you want to redirect to
+                    }, 2000);
+                })
+                .catch((error) => {
+                    // Error: display message
+                    console.error("Error logging in:", error);
+                    document.getElementById("statusMessage").textContent = error.message;
+                    document.getElementById("statusMessage").className = "error";
+                });
+        });
+    </script>
+</body>
+</html>
