@@ -5,7 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pet Adoption Finder</title>
     <link rel="stylesheet" href="style.css">
-
+<style>
+        #map { height: 380px; }
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #eef2f3;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        #complaintsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            padding: 10px;
+        }
+        .complaint-tile {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .complaint-tile:hover {
+            transform: translateY(-5px);
+        }
+        .complaint-tile h3 {
+            margin: 0;
+            color: #007BFF;
+            font-size: 18px;
+        }
+        .complaint-tile p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .complaint-tile p strong {
+            color: #222;
+        }
+    </style>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -133,6 +176,32 @@
             }
         });
     </script>
+<div id="map"></div>
 
+    <script>
+        var map = L.map('map').setView([21.2514, 81.6296], 13); // Coordinates of Raipur, Chhattisgarh
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Add three markers in random locations in Raipur
+        var marker1 = L.marker([21.2511, 81.6293]).addTo(map).bindPopup('jack');
+        var marker2 = L.marker([21.2520, 81.6305]).addTo(map).bindPopup('Siya');
+        var marker3 = L.marker([21.2532, 81.6279]).addTo(map).bindPopup('Rocky');
+
+        // Optional: Add click interaction
+        var popup = L.popup();
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
+    </script>
 </body>
 </html>
