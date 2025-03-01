@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Complaint Form</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <!-- Add some basic CSS for styling and responsiveness -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            input, textarea {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            input, textarea {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+    <body>
+        <div class="container">
+            <h2>Pet Complaint Form</h2>
+            <form id="complaintForm">
+                <label for="sensorId">Pet Name:</label>
+                <input type="text" id="sensorId" name="sensorId" placeholder="Enter Pet Name" required>
+                
+                <label for="pt_id">Pet Type:</label>
+                <input type="text" id="pt_id" name="pt_id" placeholder="Enter Pet Type" required>
+                
+                <label for="p_d">Any Disease/Past Medical Condition:</label>
+                <input type="text" id="p_d" name="p_d" placeholder="Enter Medical History" required>
+    
+                <label for="userName">Breed Type:</label>
+                <input type="text" id="userName" name="userName" placeholder="Enter Breed Type" required>
+    
+                <label for="userContact">Contact Number:</label>
+                <input type="tel" id="userContact" name="userContact" placeholder="Enter Your Contact Number" required>
+    
+                <label for="userEmail">Email:</label>
+                <input type="email" id="userEmail" name="userEmail" placeholder="Enter Your Email" required>
+    
+                <label for="complaintDetail">Pet Description:</label>
+                <textarea id="complaintDetail" name="complaintDetail" placeholder="Describe your pet..." required></textarea>
+
+                <!-- New Image Upload Field -->
+                <label for="petImage">Upload Pet Image:</label>
+                <input type="file" id="petImage" name="petImage" accept="image/*" required>
+
+                <button type="submit">Submit Complaint</button>
+            </form>
+            <p id="statusMessage"></p>
+        </div>
+
+        <script >
+
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCYJeW38aOExaqr3anIpixEIFndXwnM3VQ",
+    authDomain: "resqpets-a47bb.firebaseapp.com",
+    databaseURL: "https://resqpets-a47bb-default-rtdb.firebaseio.com",
+    projectId: "resqpets-a47bb",
+    storageBucket: "resqpets-a47bb.firebasestorage.app",
+    messagingSenderId: "860383278515",
+    appId: "1:860383278515:web:d40ff043eafe21b36b07c6",
+    measurementId: "G-CPBEHQ6FT3"
+  };
+  // Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// Handle Form Submission
+document.getElementById("complaintForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    // Get input values
+    let sensorId = document.getElementById("sensorId").value.trim();
+    let userName = document.getElementById("userName").value.trim();
+    let userContact = document.getElementById("userContact").value.trim();
+    let userEmail = document.getElementById("userEmail").value.trim();
+    let complaintDetail = document.getElementById("complaintDetail").value.trim();
+    let ptype = document.getElementById("pt_id").value;
+    let pdisease = document.getElementById("p_d").value;
+    let petImage = document.getElementById("petImage").value;
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+    
+    // Auto-fill the Sensor ID field from the QR Code URL
+    document.addEventListener("DOMContentLoaded", function() {
+        let sensorId = getQueryParam("sensorId");
+        if (sensorId) {
+            document.getElementById("sensorId").value = sensorId;
+        }
+    });
+    
+
+    if (sensorId === "" || userName === "" || userContact === "" || userEmail === "" || complaintDetail === "") {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    // Store Data in Firebase
+    let complaintsRef = database.ref("complaints").push();
+    complaintsRef.set({
+        sensorId: sensorId,
+        userName: userName,
+        userContact: userContact,
+        userEmail: userEmail,
+        complaintDetail: complaintDetail,
+        ptype: ptype,
+        pdisease: pdisease,
+        petImage: petImage, 
+        timestamp: new Date().toISOString()
+    }).then(() => {
+        document.getElementById("statusMessage").textContent = "Complaint Submitted Successfully!";
+        document.getElementById("complaintForm").reset();
+        window.location.href= 'adoption.html';
+    }).catch(error => {
+        console.error("Error submitting complaint:", error);
+        document.getElementById("statusMessage").textContent = "Error submitting complaint!";
+    });
+});
+
+        </script>
+    </body>
+</html>
