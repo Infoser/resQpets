@@ -9,59 +9,73 @@
 <body>
 
     <header>
-        <h1>🐾 ...resQpet... 🐶</h1>
-        <p>Find your perfect furry friend and chat with shelters instantly!</p>
+        <div class="header-left">
+            <h1>🐾 ...resQpet... 🐶</h1>
+            <p>Find your perfect furry friend and chat with shelters instantly!</p>
+        </div>
+
+        <!-- Login & Signup Buttons -->
+        <div class="header-right">
+            <button class="auth-btn" onclick="location.href='login.html'">Login</button>
+            <button class="auth-btn signup-btn" onclick="location.href='signup.html'">Signup</button>
+        </div>
     </header>
+
+    <!-- Search Bar & Filters -->
+    <div class="search-container">
+        <input type="text" id="searchBreed" placeholder="Search by breed...">
+        <select id="filterAge">
+            <option value="all">All Ages</option>
+            <option value="puppy">Puppies</option>
+            <option value="adult">Adults</option>
+            <option value="senior">Seniors</option>
+        </select>
+        <select id="filterLocation">
+            <option value="all">All Locations</option>
+            <option value="new york">New York</option>
+            <option value="los angeles">Los Angeles</option>
+            <option value="chicago">Chicago</option>
+        </select>
+        <button onclick="searchPets()">🔍 Search</button>
+    </div>
 
     <main>
         <div class="pet-container">
-            <!-- Pet 1 -->
-            <div class="pet-card">
+            <!-- Pet Cards (Sample) -->
+            <div class="pet-card" data-breed="golden retriever" data-age="adult" data-location="new york">
                 <img src="https://images.pexels.com/photos/1805164/pexels-photo-1805164.jpeg" alt="Golden Retriever">
                 <h2>Max</h2>
                 <p><strong>Breed:</strong> Golden Retriever</p>
-                <p><strong>Age:</strong> 2 years</p>
-                <button onclick="openChat('67c2951a7a22aa19148247d9/1il81cs0b')">Chat with Shelter 1</button>
-            </div>
-
-            <!-- Pet 2 -->
-            <div class="pet-card">
-                <img src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg" alt="Labrador">
-                <h2>Bella</h2>
-                <p><strong>Breed:</strong> Labrador</p>
-                <p><strong>Age:</strong> 1.5 years</p>
-                <button onclick="openChat('67c2a2ffed4e07190ae50ab5/1il84pdvf')">Chat with Shelter 2</button>
-            </div>
-
-            <!-- Pet 3 -->
-            <div class="pet-card">
-                <img src="https://images.pexels.com/photos/4587993/pexels-photo-4587993.jpeg" alt="Beagle">
-                <h2>Charlie</h2>
-                <p><strong>Breed:</strong> Beagle</p>
-                <p><strong>Age:</strong> 3 years</p>
-                <button onclick="openChat('67c2a347538468190b80e4a3/1il84rjui')">Chat with Shelter 3</button>
+                <p><strong>Age:</strong> 2 years (Adult)</p>
+                <p><strong>Location:</strong> New York</p>
+                <button onclick="openChat('67c2951a7a22aa19148247d9/1il81cs0b')">Chat with Shelter</button>
             </div>
         </div>
     </main>
 
     <!-- Tawk.to Chat Widget -->
     <script type="text/javascript">
-        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-        (function(){
-            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-            s1.async=true;
-            s1.src='https://embed.tawk.to/67c2a2ffed4e07190ae50ab5/1il84pdvf';
-            s1.charset='UTF-8';
-            s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1,s0);
-        })();
+        function searchPets() {
+            let searchBreed = document.getElementById("searchBreed").value.toLowerCase();
+            let filterAge = document.getElementById("filterAge").value.toLowerCase();
+            let filterLocation = document.getElementById("filterLocation").value.toLowerCase();
+            let petCards = document.querySelectorAll(".pet-card");
 
-        function openChat(propertyId) {
-            if (typeof Tawk_API !== 'undefined') {
-                Tawk_API.toggle(); // Opens chat window
-            } else {
-                window.open(`https://embed.tawk.to/${propertyId}`, '_blank'); // Opens in a new tab if script isn't ready
-            }
+            petCards.forEach(card => {
+                let petBreed = card.dataset.breed.toLowerCase();
+                let petAge = card.dataset.age.toLowerCase();
+                let petLocation = card.dataset.location.toLowerCase();
+
+                let matchesBreed = searchBreed === "" || petBreed.includes(searchBreed);
+                let matchesAge = filterAge === "all" || petAge === filterAge;
+                let matchesLocation = filterLocation === "all" || petLocation.includes(filterLocation);
+
+                if (matchesBreed && matchesAge && matchesLocation) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
         }
     </script>
 
