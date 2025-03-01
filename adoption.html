@@ -5,6 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pet Adoption Finder</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #eef2f3;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        #complaintsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            padding: 10px;
+        }
+        .complaint-tile {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .complaint-tile:hover {
+            transform: translateY(-5px);
+        }
+        .complaint-tile h3 {
+            margin: 0;
+            color: #007BFF;
+            font-size: 18px;
+        }
+        .complaint-tile p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .complaint-tile p strong {
+            color: #222;
+        }
+    </style>
 </head>
 <body>
 
@@ -39,44 +82,56 @@
         <button onclick="searchPets()">🔍 Search</button>
     </div>
 
-    <main>
-        <div class="pet-container">
-            <!-- Pet Cards (Sample) -->
-            <div class="pet-card" data-breed="golden retriever" data-age="adult" data-location="new york">
-                <img src="https://images.pexels.com/photos/1805164/pexels-photo-1805164.jpeg" alt="Golden Retriever">
-                <h2>Max</h2>
-                <p><strong>Breed:</strong> Golden Retriever</p>
-                <p><strong>Age:</strong> 2 years (Adult)</p>
-                <p><strong>Location:</strong> New York</p>
-                <button onclick="openChat('67c2951a7a22aa19148247d9/1il81cs0b')">Chat with Shelter</button>
-            </div>
-        </div>
-    </main>
+    <h2>Browse Pets</h2>
+    <div id="complaintsContainer"></div>
 
-    <!-- Tawk.to Chat Widget -->
-    <script type="text/javascript">
-        function searchPets() {
-            let searchBreed = document.getElementById("searchBreed").value.toLowerCase();
-            let filterAge = document.getElementById("filterAge").value.toLowerCase();
-            let filterLocation = document.getElementById("filterLocation").value.toLowerCase();
-            let petCards = document.querySelectorAll(".pet-card");
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
 
-            petCards.forEach(card => {
-                let petBreed = card.dataset.breed.toLowerCase();
-                let petAge = card.dataset.age.toLowerCase();
-                let petLocation = card.dataset.location.toLowerCase();
+        // Firebase configuration
+        const firebaseConfig = {
+  apiKey: "AIzaSyCYJeW38aOExaqr3anIpixEIFndXwnM3VQ",
+  authDomain: "resqpets-a47bb.firebaseapp.com",
+  databaseURL: "https://resqpets-a47bb-default-rtdb.firebaseio.com",
+  projectId: "resqpets-a47bb",
+  storageBucket: "resqpets-a47bb.firebasestorage.app",
+  messagingSenderId: "860383278515",
+  appId: "1:860383278515:web:d40ff043eafe21b36b07c6",
+  measurementId: "G-CPBEHQ6FT3"
+};
 
-                let matchesBreed = searchBreed === "" || petBreed.includes(searchBreed);
-                let matchesAge = filterAge === "all" || petAge === filterAge;
-                let matchesLocation = filterLocation === "all" || petLocation.includes(filterLocation);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const complaintsRef = ref(db, "complaints");
 
-                if (matchesBreed && matchesAge && matchesLocation) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-        }
+        // Fetch and display complaints
+        onValue(complaintsRef, (snapshot) => {
+            const complaintsContainer = document.getElementById("complaintsContainer");
+            complaintsContainer.innerHTML = "";
+
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const complaint = childSnapshot.val();
+                    
+                    const tile = document.createElement("div");
+                    tile.classList.add("complaint-tile");
+                    tile.innerHTML = `
+                        <h3>Adpotion for Animal: ${complaint.sensorId}</h3>
+                        <p><strong>Breed Type:</strong> ${complaint.userName}</p>
+                        <p><strong>Contact:</strong> ${complaint.userContact}</p>
+                        <p><strong>Email:</strong> ${complaint.userEmail}</p>
+                        <p><strong>Description:</strong> ${complaint.complaintDetail}</p>
+                        <p><strong>Timestamp:</strong> ${new Date(complaint.timestamp).toLocaleString()}</p>
+
+                    `;
+                    complaintsContainer.appendChild(tile);
+                });
+            } else {
+                complaintsContainer.innerHTML = "<p>No complaints found.</p>";
+            }
+        });
     </script>
 
 </body>
