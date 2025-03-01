@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Adoption Sign-Up</title>
+
+    <!-- Style for beautifying the form and adding background images -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: url('https://placekitten.com/1920/1080') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 350px;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #ff5722;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #e64a19;
+        }
+
+        /* Responsive background random images */
+        .background-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-position: center;
+            background-size: cover;
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-img" id="backgroundImg"></div>
+
+    <div class="container">
+        <h2>Sign Up for Pet Adoption</h2>
+        <form id="signupForm">
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <input type="password" id="pass" placeholder="Enter your password" required>
+            <button type="submit" id="submit">Sign Up</button>
+        </form>
+    </div>
+
+    <!-- Firebase scripts -->
+    <script type="module">
+        // Import Firebase configuration and libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+
+        // Firebase configuration (replace with your own project details)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYJeW38aOExaqr3anIpixEIFndXwnM3VQ",
+            authDomain: "resqpets-a47bb.firebaseapp.com",
+            projectId: "resqpets-a47bb",
+            storageBucket: "resqpets-a47bb.firebasestorage.app",
+            messagingSenderId: "860383278515",
+            appId: "1:860383278515:web:d40ff043eafe21b36b07c6",
+            measurementId: "G-CPBEHQ6FT3"
+        };
+
+        // Initialize Firebase app
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Handle form submission
+        const signupForm = document.getElementById("signupForm");
+        signupForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("pass").value;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Save user data to Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    email: email,
+                    createdAt: new Date().toISOString(),
+                    password: password
+                });
+
+                // After successful signup, redirect to dashboard
+                alert("User registered successfully!");
+                window.location.href = "dashboard.html"; // Redirect to the dashboard page
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error: " + error.message);
+            }
+        });
+
+        // Array of random pet image URLs
+        const petImages = [
+            'https://cdn.britannica.com/39/226539-050-D21D7721/Portrait-of-a-cat-with-whiskers-visible.jpg'
+      
+        ];
+
+        // Set a random background image on page load
+        const backgroundImg = document.getElementById("backgroundImg");
+        const randomImage = petImages[Math.floor(Math.random() * petImages.length)];
+        backgroundImg.style.backgroundImage = `url('${randomImage}')`;
+    </script>
+</body>
+</html>
